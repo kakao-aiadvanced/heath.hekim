@@ -7,11 +7,12 @@ def load_config(filename):
         return yaml.safe_load(file)
 
 def ask_llm(messages):
+
     r = requests.post(
         config["url"],
-        json={"model": config['model'], "messages": messages, "stream": True},
-	stream=True
-    )
+        json={"model": "llama3", "messages": messages, "stream": True},
+        stream=True
+        ) 
     r.raise_for_status()
     output = ""
 
@@ -55,10 +56,11 @@ def ask_openapi(user_prompt):
     return json_response
 
 def ask(prompt):
+    msg = [{"role":"user", "content":prompt}]
     if config["target"] == "openai":
-        message = ask_openapi(prompt)
+        message = ask_openapi(msg)
     else:
-        message = ask_llm(prompt)
+        message = ask_llm(msg)
 
     return message
 
@@ -70,7 +72,7 @@ def get_agent(user_input):
 - If the question pertains to historical events, figures, dates, or interpretations of past events (like World War II, the Renaissance, ancient civilizations, etc.), the prompt should select the "history teacher".
 
 The response should be in JSON format, indicating the chosen agent. The json output should have only the target agent only as key,
-For example, \{"agent": "math teacher"\} or \{"agent": "history teacher"\}.
+For example, {{"agent": "math teacher"}} or {{"agent": "history teacher"}}.
 
 user question: {user_input}'''
 
