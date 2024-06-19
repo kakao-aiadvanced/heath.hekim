@@ -8,6 +8,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
 from langchain_openai import OpenAIEmbeddings
 
+from langchain_core.output_parsers import StrOutputParser
+
 import chromadb
 
 def load_config(filename):
@@ -42,11 +44,16 @@ def main():
     else:
         db = Chroma.from_documents(splits, embeddings, persist_directory=persist_directory)
 
-    retriever = db.as_retriever()
+    # 하나만
+    retriever = db.as_retriever(search_kwargs={'k': 1})
 
-    chunks = retriever.invoke("agent memory")
+    found_chunks = retriever.invoke("agent memory")
 
-    print(chunks)
+    chain = (
+    llm
+    | StrOutputParser())
+
+    chain.invoke(f"{}", found_chunks)
 
 if __name__ == "__main__":
     config = load_config('config.yaml')
